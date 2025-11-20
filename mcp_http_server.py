@@ -9,7 +9,7 @@ import base64
 import json
 import tempfile
 from typing import Optional
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, Field
 import uvicorn
@@ -56,6 +56,7 @@ class GenerateImageRequest(BaseModel):
     """Request model for image generation."""
     grid_data: GridData = Field(..., description="Grid availability data")
     return_base64: bool = Field(False, description="If true, return image as base64. If false, return as PNG binary.")
+    vertical: bool = Field(False, description="If true, generate vertical image (250x1024px). If false, generate horizontal image (1024x250px).")
 
 
 @app.get("/")
@@ -132,6 +133,11 @@ async def list_tools():
                             "type": "boolean",
                             "description": "If true, return the image as a base64-encoded string.",
                             "default": False
+                        },
+                        "vertical": {
+                            "type": "boolean",
+                            "description": "If true, generate vertical image (250x1024px). If false, generate horizontal image (1024x250px).",
+                            "default": False
                         }
                     },
                     "required": ["grid_data"]
@@ -142,9 +148,19 @@ async def list_tools():
 
 
 @app.post("/tools/generate_grid_availability_image")
-async def generate_grid_availability_image(request: GenerateImageRequest):
-    """Generate grid availability image."""
+async def generate_grid_availability_image(
+    request: GenerateImageRequest,
+    vertical: bool = Query(False, description="If true, generate vertical image (250x1024px)")
+):
+    """Generate grid availability image.
+    
+    Supports vertical parameter both in request body and as query parameter.
+    Query parameter takes precedence if both are provided.
+    """
     try:
+        # Override vertical from query parameter if provided
+        is_vertical = vertical or request.vertical
+        
         # Convert Pydantic model to dict (compatible with both v1 and v2)
         try:
             # Pydantic v2
@@ -161,8 +177,11 @@ async def generate_grid_availability_image(request: GenerateImageRequest):
         with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp_file:
             output_path = tmp_file.name
         
-        # Generate the image
-        generate_image(grid_data_dict, output_path)
+        # Generate the image (with vertical parameter)
+        generate_image(grid_data_dict, output_path, vertical=is_vertical)
+        
+        # Determine image size string
+        image_size = "250x1024px" if is_vertical else "1024x250px"
         
         if request.return_base64:
             # Read image and convert to base64
@@ -173,7 +192,7 @@ async def generate_grid_availability_image(request: GenerateImageRequest):
             return JSONResponse(content={
                 "success": True,
                 "message": "Grid availability image generated successfully",
-                "image_size": "1024x250px",
+                "image_size": image_size,
                 "image_base64": base64_data,
                 "mime_type": "image/png"
             })
@@ -195,9 +214,16 @@ async def generate_grid_availability_image(request: GenerateImageRequest):
 
 
 @app.post("/generate")
-async def generate_simple(request: GenerateImageRequest):
-    """Simplified endpoint for n8n integration."""
-    return await generate_grid_availability_image(request)
+async def generate_simple(
+    request: GenerateImageRequest,
+    vertical: bool = Query(False, description="If true, generate vertical image (250x1024px)")
+):
+    """Simplified endpoint for n8n integration.
+    
+    Supports vertical parameter as query parameter for easier integration.
+    Example: POST /generate?vertical=true
+    """
+    return await generate_grid_availability_image(request, vertical=vertical)
 
 
 if __name__ == "__main__":
