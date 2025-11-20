@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  grid-image-generator-http:
+    build:
+      context: .
+      dockerfile: Dockerfile.http
+    container_name: grid-image-generator-http
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./output:/app/output
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PORT=8000
+      - HOST=0.0.0.0
+    restart: unless-stopped
+

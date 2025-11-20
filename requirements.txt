@@ -1,3 +1,6 @@
 Pillow>=10.0.0
 mcp
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+pydantic>=1.10.0
 
