@@ -18,6 +18,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application files
 COPY generate_grid_image.py .
+COPY mcp_server.py .
 COPY mcp_http_server.py .
 
 # Make the server executable
