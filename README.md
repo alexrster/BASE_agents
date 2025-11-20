@@ -1,5 +1,10 @@
 # Electricity Grid Availability Image Generator - MCP Server
 
+[![CI](https://github.com/YOUR_USERNAME/BASE_agents/workflows/CI/badge.svg)](https://github.com/YOUR_USERNAME/BASE_agents/actions/workflows/ci.yml)
+[![Docker Build](https://github.com/YOUR_USERNAME/BASE_agents/workflows/Build%20and%20Push%20Docker%20Image/badge.svg)](https://github.com/YOUR_USERNAME/BASE_agents/actions/workflows/docker-build.yml)
+
+> **Note**: Replace `YOUR_USERNAME` in the badges above with your GitHub username or organization name.
+
 This project provides an MCP (Model Context Protocol) server that generates visualizations of electricity grid availability.
 
 ## Features
@@ -188,4 +193,50 @@ Then configure:
 ```
 
 Then use Option 1 configuration above.
+
+## CI/CD
+
+This project uses GitHub Actions for continuous integration and deployment:
+
+### CI Pipeline
+
+The CI pipeline (`ci.yml`) runs on every push and pull request:
+- Lints Python code with flake8
+- Checks Python syntax
+- Tests MCP server imports
+- Tests image generation functionality
+
+### Docker Build Pipeline
+
+The Docker build pipeline (`docker-build.yml`) automatically:
+- Builds Docker images for multiple platforms (linux/amd64, linux/arm64)
+- Pushes images to GitHub Container Registry (ghcr.io)
+- Tags images with branch names, commit SHAs, and semantic versions
+- Uses Docker layer caching for faster builds
+
+### Release Pipeline
+
+The release pipeline (`release.yml`) runs when:
+- A new GitHub release is published
+- Manually triggered via workflow_dispatch
+
+It builds and pushes versioned Docker images to the container registry.
+
+### Using Pre-built Images
+
+You can use the pre-built Docker images from GitHub Container Registry:
+
+```bash
+# Pull the latest image
+docker pull ghcr.io/YOUR_USERNAME/BASE_agents:latest
+
+# Or use a specific version
+docker pull ghcr.io/YOUR_USERNAME/BASE_agents:v1.0.0
+```
+
+Replace `YOUR_USERNAME` with your GitHub username or organization name.
+
+### Workflow Status
+
+Check the [Actions tab](https://github.com/YOUR_USERNAME/BASE_agents/actions) in your repository to view workflow runs and their status.
 

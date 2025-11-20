@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+    
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          libfreetype6-dev \
+          libjpeg-dev \
+          zlib1g-dev
+    
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install flake8 pytest
+    
+    - name: Lint with flake8
+      run: |
+        # Stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # Exit-zero treats all errors as warnings
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+      continue-on-error: true
+    
+    - name: Check Python syntax
+      run: |
+        python -m py_compile generate_grid_image.py mcp_server.py
+    
+    - name: Test MCP server imports
+      run: |
+        python -c "from mcp.server import Server; from mcp.server.stdio import stdio_server; from mcp.types import Tool, TextContent, ImageContent; print('MCP imports successful')"
+    
+    - name: Test image generation function
+      run: |
+        python -c "
+        from generate_grid_image import generate_image
+        test_data = {
+            'T_Date': '20-11-2025',
+            'T_00': '●', 'T_01': '●', 'T_02': '●', 'T_03': '●',
+            'T_04': '●', 'T_05': '●', 'T_06': '✕', 'T_07': '✕',
+            'T_08': '✕', 'T_09': '✕', 'T_10': '✕', 'T_11': '✕',
+            'T_12': '✕', 'T_13': '●', 'T_14': '●', 'T_15': '●',
+            'T_16': '%', 'T_17': '✕', 'T_18': '✕', 'T_19': '✕',
+            'T_20': '✕', 'T_21': '✕', 'T_22': '✕', 'T_23': '%'
+        }
+        import tempfile
+        import os
+        with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp:
+            output_path = tmp.name
+        try:
+            generate_image(test_data, output_path)
+            assert os.path.exists(output_path), 'Image file was not created'
+            assert os.path.getsize(output_path) > 0, 'Image file is empty'
+            print('Image generation test passed')
+        finally:
+            if os.path.exists(output_path):
+                os.remove(output_path)
+        "
+
