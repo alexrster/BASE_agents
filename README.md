@@ -1,9 +1,7 @@
 # Electricity Grid Availability Image Generator - MCP Server
 
-[![CI](https://github.com/YOUR_USERNAME/BASE_agents/workflows/CI/badge.svg)](https://github.com/YOUR_USERNAME/BASE_agents/actions/workflows/ci.yml)
-[![Docker Build](https://github.com/YOUR_USERNAME/BASE_agents/workflows/Build%20and%20Push%20Docker%20Image/badge.svg)](https://github.com/YOUR_USERNAME/BASE_agents/actions/workflows/docker-build.yml)
-
-> **Note**: Replace `YOUR_USERNAME` in the badges above with your GitHub username or organization name.
+[![CI](https://github.com/alexrster/BASE_agents/workflows/CI/badge.svg)](https://github.com/alexrster/BASE_agents/actions/workflows/ci.yml)
+[![Docker Build](https://github.com/alexrster/BASE_agents/workflows/Build%20and%20Push%20Docker%20Image/badge.svg)](https://github.com/alexrster/BASE_agents/actions/workflows/docker-build.yml)
 
 This project provides an MCP (Model Context Protocol) server that generates visualizations of electricity grid availability.
 
@@ -228,15 +226,15 @@ You can use the pre-built Docker images from GitHub Container Registry:
 
 ```bash
 # Pull the latest image
-docker pull ghcr.io/YOUR_USERNAME/BASE_agents:latest
+docker pull ghcr.io/alexrster/BASE_agents:latest
 
 # Or use a specific version
-docker pull ghcr.io/YOUR_USERNAME/BASE_agents:v1.0.0
+docker pull ghcr.io/alexrster/BASE_agents:v1.0.0
 ```
 
-Replace `YOUR_USERNAME` with your GitHub username or organization name.
+Replace `alexrster` with your GitHub username or organization name.
 
 ### Workflow Status
 
-Check the [Actions tab](https://github.com/YOUR_USERNAME/BASE_agents/actions) in your repository to view workflow runs and their status.
+Check the [Actions tab](https://github.com/alexrster/BASE_agents/actions) in your repository to view workflow runs and their status.
 
