@@ -1,16 +1,18 @@
 version: '3.8'
 
 services:
-  grid-image-generator:
-    build: .
-    container_name: grid-image-generator-mcp
-    stdin_open: true
-    tty: true
+  grid-image-generator-http:
+    build:
+      context: .
+      dockerfile: Dockerfile.http
+    container_name: grid-image-generator-http
+    ports:
+      - "8000:8000"
     volumes:
       - ./output:/app/output
     environment:
       - PYTHONUNBUFFERED=1
-    # For MCP stdio communication, we need to keep stdin open
-    # The container will run the MCP server and wait for stdio input
-    restart: "no"
+      - PORT=8000
+      - HOST=0.0.0.0
+    restart: unless-stopped
 

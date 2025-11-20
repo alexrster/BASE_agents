@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  grid-image-generator:
+    build: .
+    container_name: grid-image-generator-mcp
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./output:/app/output
+    environment:
+      - PYTHONUNBUFFERED=1
+    # For MCP stdio communication, we need to keep stdin open
+    # The container will run the MCP server and wait for stdio input
+    restart: "no"
+
